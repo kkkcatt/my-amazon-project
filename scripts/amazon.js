@@ -1,3 +1,6 @@
+import {cart,addToCart} from '../data/cart.js';
+import {products} from '../data/products.js';
+import {formatCurrency} from './utils/money.js'
 let productHtml ='';
 
 products.forEach((product) => {
@@ -21,11 +24,11 @@ products.forEach((product) => {
 				</div>
 
 				<div class="product-price">
-						$${(product.priceCents / 100).toFixed(2) }
+						$${formatCurrency(product.priceCents)}
 				</div>
 
-				<div class="product-quantity-container">
-						<select>
+				<div class="product-quantity-container ">
+						<select  class="js-quantity-selector-${product.id}">
 						<option selected value="1">1</option>
 						<option value="2">2</option>
 						<option value="3">3</option>
@@ -41,7 +44,7 @@ products.forEach((product) => {
 
 				<div class="product-spacer"></div>
 
-				<div class="added-to-cart">
+				<div  class="added-to-cart">
 						<img src="images/icons/checkmark.png">
 						Added
 				</div>
@@ -54,33 +57,19 @@ products.forEach((product) => {
 				</div>
 	`;
 });
-let cartQuantity = 0
+function updateCartQuantity() {
+	let cartQuantity = 0;
+	cart.forEach((cartItem) => {
+		cartQuantity += cartItem.quantity
+	})
+	document.querySelector(`.js-cart-quantity`).innerHTML = cartQuantity;
+}
+
 document.querySelector('.js-products-grid').innerHTML = productHtml;
 document.querySelectorAll('.js-add-to-cart').forEach((button)=>{
 	button.addEventListener('click',()=>{
-		const productId = button.dataset.productId
-		let matchingItem
-
-		cart.forEach((item) => {
-			if(productId === item.productId){
-				matchingItem = item
-			} 
-		});
-		if(matchingItem){
-			matchingItem.quantity += 1;
-		} else {
-			cart.push({
-				productId: productId,
-  			quantity:1
-			})
-		}
-		// matchingItem = ''
-		// cart.forEach((item) => {
-		// 	cartQuantity =cartQuantity + item.quantity 
-		// })
-		console.log(cart)
-		// console.log(cartQuantity)
+		const {productId} = button.dataset
+		addToCart(productId);
+		updateCartQuantity()
 	})
 })
-
-document.querySelector('.js-cart-quantity').innerHTML = cartQuantity
